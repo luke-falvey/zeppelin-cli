@@ -22,14 +22,15 @@ impl Env {
 
     fn cmd(&self) -> Command {
         let mut c = Command::cargo_bin("zeppelin").unwrap();
-        // HOME controls where ~/.zeppelin.toml is found; keep the sandbox proxy out of local calls.
-        c.env("HOME", self.dir.path())
+        // Point at the temp config explicitly (HOME isn't used on Windows) and keep
+        // any HTTP proxy out of calls to the local mock server.
+        c.env("ZEPPELIN_CONFIG", self.dir.path().join(".zeppelin.toml"))
+            .env("HOME", self.dir.path())
             .env("NO_PROXY", "127.0.0.1,localhost")
             .env_remove("ZEPPELIN_PROFILE")
             .env_remove("ZEPPELIN_URL")
             .env_remove("ZEPPELIN_USERNAME")
-            .env_remove("ZEPPELIN_PASSWORD")
-            .env_remove("ZEPPELIN_CONFIG");
+            .env_remove("ZEPPELIN_PASSWORD");
         c
     }
 }
