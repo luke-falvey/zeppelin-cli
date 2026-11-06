@@ -1,0 +1,25 @@
+[package]
+name = "zeppelin"
+version = "0.1.0"
+edition = "2024"
+description = "Command-line client for the Apache Zeppelin 0.11 Notebook REST API"
+license = "Apache-2.0"
+
+[[bin]]
+name = "zeppelin"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0.104"
+clap = { version = "4.6.7", features = ["derive", "env"] }
+dirs = "7.0.0"
+reqwest = { version = "0.13.5", default-features = false, features = ["blocking", "json", "cookies", "rustls", "form", "query"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+toml = "1.2.0"
+
+[dev-dependencies]
+assert_cmd = "2.2.2"
+mockito = "1.7.2"
+predicates = "3.1.4"
+tempfile = "3.27.0"

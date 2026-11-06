@@ -1,0 +1,18 @@
+{
+  "name": "/examples/hello-shell",
+  "paragraphs": [
+    {
+      "title": "Intro",
+      "text": "%md\n# Hello from the zeppelin CLI\nThis note was created from `examples/notebooks/hello-shell.json`."
+    },
+    {
+      "title": "Generate data",
+      "text": "%sh\nfor i in 1 2 3 4 5; do echo \"row,$i,$((i * i))\"; done > /tmp/zeppelin-cli-demo.csv\nwc -l /tmp/zeppelin-cli-demo.csv"
+    },
+    {
+      "title": "Summarise",
+      "text": "%sh\nawk -F, '{ s += $3 } END { print \"sum of squares:\", s }' /tmp/zeppelin-cli-demo.csv",
+      "config": { "colWidth": 6.0 }
+    }
+  ]
+}
