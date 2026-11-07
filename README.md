@@ -36,12 +36,61 @@ zeppelin note delete "$NOTE"
 ```
 
 - **Usage guide and worked examples:** [SKILLS.md](SKILLS.md). It has YAML front matter, so it can be dropped into a skills directory as-is.
-- **Configuration:** `~/.zeppelin.toml` holds profiles (each with `base_url`, `username`, `password`) and top-level default credentials. Pick a profile with `-p NAME` or `ZEPPELIN_PROFILE`.
+- **Configuration:** profiles in `~/.zeppelin.toml`; see [Configuration](#configuration).
 - **Command coverage:**
   - Notes: list, create, get, delete, clone, rename, import, export, run all, stop all, status, clear output.
   - Paragraphs: create, get, update, config, move, delete, run (async or sync), stop, status.
   - Also full-text search, cron, permissions and revisions.
   - Helpers: `note wait`, `paragraph wait`, `note output`, `paragraph output`, `note id`.
+
+## Configuration
+
+Connection settings live in `~/.zeppelin.toml`. Each profile is one Zeppelin server. Username and
+password at the top level are the defaults for every profile that doesn't set its own.
+
+```toml
+# ~/.zeppelin.toml
+
+# Profile used when neither --profile nor ZEPPELIN_PROFILE is given.
+default_profile = "local"
+
+# Default credentials for every profile below.
+username = "admin"
+password = "password1"
+
+[profiles.local]
+base_url = "http://localhost:8080"          # /api is appended automatically
+
+[profiles.staging]
+base_url = "https://zeppelin.staging.example.com"
+# no username/password here, so it uses the top-level ones
+
+[profiles.prod]
+base_url = "https://zeppelin.example.com/zeppelin"   # sub-paths work too
+username = "svc-zeppelin"                   # overrides the top-level username
+password = "change-me"
+```
+
+How each setting is chosen (first match wins):
+
+| Setting | Order |
+|---|---|
+| Profile | `--profile`/`-p`, `ZEPPELIN_PROFILE`, `default_profile`, a profile named `default`, the only profile if there's just one |
+| Server URL | `--url`/`ZEPPELIN_URL`, then the profile's `base_url` |
+| Username / password | `--username`/`--password` (or `ZEPPELIN_USERNAME`/`ZEPPELIN_PASSWORD`), then the profile, then the top level |
+
+With a username set, the CLI logs in through `POST /api/login` and reuses the session cookie.
+Unknown keys are rejected, so a typo like `baseurl` is an error rather than silently ignored. Use
+`--config PATH` or `ZEPPELIN_CONFIG` to read a different file.
+
+```bash
+zeppelin config example        # print a starter file
+zeppelin config profiles       # list profiles and which one is the default
+zeppelin -p prod config show   # the settings a command would use (password hidden)
+zeppelin -p prod ping          # check the server is reachable and the login works
+```
+
+The file holds passwords, so make it readable only by you: `chmod 600 ~/.zeppelin.toml`.
 
 ## Development
 
